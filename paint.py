@@ -14,6 +14,7 @@ mpdraw = mp.solutions.drawing_utils
 header = cv2.imread("color.png")
 capture.set(3, 1280)
 thickness = 8
+erase_thickness = 80
 capture.set(4, 720)
 xp , yp = None,None
 draw_color = (255, 0, 255)
@@ -49,7 +50,26 @@ while True:
         x2 = lm_list[12][1]
         y2 = lm_list[12][2]
 
-        if lm_list[8][2]<lm_list[7][2] and lm_list[12][2]<lm_list[11][2] :
+
+        #if my hand open:
+        #erase 
+        if lm_list[4][1]<lm_list[2][1] and lm_list[8][2]<lm_list[6][2] and lm_list[12][2]<lm_list[10][2] and lm_list[16][2]<lm_list[14][2] and lm_list[20][2]<lm_list[18][2]:
+             #hand open 
+             x0 = lm_list[9][1]
+             y0 = lm_list[9][2]
+             if xp is None or  yp is None:
+                    xp, yp = x0, y0
+                
+          
+             cv2.line(canvas, (xp, yp), (x0, y0), (0, 0, 0), erase_thickness)
+             cv2.line(img, (xp, yp), (x0, y0), (0,0,0), erase_thickness)
+             xp = x0
+             yp = y0 
+
+
+
+
+        elif lm_list[8][2]<lm_list[7][2] and lm_list[12][2]<lm_list[11][2] :
                 
                 xp, yp = None, None 
                 cv2.rectangle(img, (x1, y1 - 25), (x2, y2 + 25), draw_color, cv2.FILLED)
@@ -77,12 +97,9 @@ while True:
         elif lm_list[8][2] < lm_list[7][2] and lm_list[12][2] > lm_list[11][2]:
                 if xp is None and yp is None:
                         xp, yp = x1, y1
-                if draw_color == (0, 0, 0):  # eraser mode
-                    cv2.line(canvas, (xp, yp), (x1, y1), (0, 0, 0), thickness)
-                    cv2.line(img, (xp, yp), (x1, y1), draw_color, thickness)
-                else:
-                    cv2.line(canvas, (xp, yp), (x1, y1), draw_color, thickness)
-                    cv2.line(canvas, (xp, yp), (x1, y1), draw_color, thickness)
+
+                cv2.line(img, (xp, yp), (x1, y1), draw_color, thickness)
+                cv2.line(canvas, (xp, yp), (x1, y1), draw_color, thickness)
 
                 xp =x1
                 yp = y1
@@ -93,9 +110,6 @@ while True:
     img = cv2.bitwise_or(img, canvas)
         
               
-    
-
-
     cv2.imshow("image",img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
             break
